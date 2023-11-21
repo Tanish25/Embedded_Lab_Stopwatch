@@ -111,6 +111,7 @@ void UART_Transmit(uint8_t TxWordF)
 }
 void SysTickHandler()
 {
+       uint8_t wait=0;
     STCTRL=0x00;//to stop timer and clear Interrupt bit
     time_count++;
     if(time_count%10==0)
@@ -148,17 +149,21 @@ void SysTickHandler()
                                              null_string++;
                               }
                null_string=orig_null_string;
+
+               while(wait);
+
     }
      STRELOAD=100*16000;//100ms delay
      STCURRENT=0;
      STCTRL |= (CLKINT | ENABLE |INTEN);//start systick
+
 
 }
 void GPIO_PortF_Handler()//change name in startup.ccs
 {
     GPIO_PORTF_ICR_R |= MASK_BITS; // clear the GPIO interrupt
 
-       if(GPIO_PORTF_DATA_R & 0x01)//SW2 pressed
+       if(GPIO_PORTF_DATA_R & 0x01)//SW1 pressed
            {
            int i;
            for(i=0;i<1000;i++){GPIO_PORTF_IM_R &= ~(MASK_BITS);} // mask interrupt by setting bits}//to account for debouncing
@@ -191,7 +196,7 @@ void GPIO_PortF_Handler()//change name in startup.ccs
                       }
 
            }
-       if(GPIO_PORTF_DATA_R & 0x10)//SW1 pressed
+       if(GPIO_PORTF_DATA_R & 0x10)//SW2 pressed
        {
                GPIO_PORTF_DATA_R |= (1<<BLUE_LED);//Turn ON BLUE LED
                int i=0;
